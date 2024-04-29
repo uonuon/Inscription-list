@@ -5,6 +5,14 @@ import OrdinalDetailsScreen from '../screens/InscriptionDetails';
 
 const Stack = createStackNavigator();
 
+const style = {
+  headerStyle: {
+    backgroundColor: '#1A1A1A',
+  },
+  headerShadowVisible: false,
+  headerTintColor: '#fff',
+};
+
 const AppNavigator: React.FC = () => {
   return (
     <Stack.Navigator>
@@ -13,14 +21,7 @@ const AppNavigator: React.FC = () => {
         component={Home}
         options={{
           title: 'Ordinals',
-          headerStyle: {
-            backgroundColor: '#1A1A1A',
-          },
-          headerShadowVisible: false,
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          ...style,
         }}
       />
       <Stack.Screen
@@ -28,14 +29,7 @@ const AppNavigator: React.FC = () => {
         component={OrdinalDetailsScreen}
         options={{
           title: 'Details',
-          headerStyle: {
-            backgroundColor: '#1A1A1A',
-          },
-          headerShadowVisible: false,
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          ...style,
         }}
       />
     </Stack.Navigator>

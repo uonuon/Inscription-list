@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, ActivityIndicator} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import useOrdinalDetails from '../../hooks/useOrdinalDetails';
+import useOrdinalDetails, {ContentType} from '../../hooks/useOrdinalDetails';
 import Video from 'react-native-video';
 import WebView from 'react-native-webview';
 
@@ -46,81 +46,43 @@ const OrdinalDetailsScreen: React.FC<OrdinalDetailsScreenProps> = ({route}) => {
       </View>
     );
   }
-  const renderContent = (content: any) => {
-    if (
-      typeof content === 'string' ||
-      (content && typeof content === 'object' && content.hasOwnProperty('url'))
-    ) {
-      return renderMediaContent(content);
-    }
-  };
-
-  const renderMediaContent = (content: any) => {
-    if (content.url) {
-      if (inscriptionDetails.content_type?.includes('video')) {
+  const renderContent = () => {
+    switch (content.type) {
+      case ContentType.Image:
+        return (
+          <Image
+            source={{uri: content.data}}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        );
+      case ContentType.Video:
         return (
           <Video
-            controls
             paused={false}
-            source={{uri: content.url}}
+            controls
+            source={{uri: content.data}}
             style={styles.image}
           />
         );
-      } else {
-        return (
-          <Image
-            source={{uri: content.url}}
-            style={styles.image}
-            resizeMode={'cover'}
-          />
-        );
-      }
-    } else if (content.includes('<script')) {
-      const dataCollectionRegex = /data-collection="([^"]+)"/;
-      const dataSrcRegex = /src="([^"]+)"/;
-      const dataPRegex = /data-p="([^"]+)"/;
-      const matches = dataCollectionRegex.exec(content);
-      const matchesSrc = dataSrcRegex.exec(content);
-      const matchesP = dataPRegex.exec(content);
-
-      if (matches) {
-        const src = matches[1];
-        return (
-          <Image
-            source={{uri: `https://ord.xverse.app/content/${src}`}}
-            resizeMode="cover"
-            style={styles.image}
-          />
-        );
-      } else if (matchesP) {
-        const src = matchesP[1].split(',')[0];
-        return (
-          <Image
-            source={{uri: `https://ord.xverse.app/content/${src}`}}
-            resizeMode="cover"
-            style={styles.image}
-          />
-        );
-      } else if (matchesSrc) {
-        const src = matchesSrc[1];
+      case ContentType.HTML:
         return (
           <WebView
-            source={{uri: `https://ord.xverse.app${src}`}}
-            style={{flex: 1, height: 200}}
+            originWhitelist={['https://*']}
+            source={{html: content.data}}
+            style={{flex: 1, width: '100%', height: 200}}
           />
         );
-      }
-    } else if (content.includes('<html>')) {
-      return (
-        <WebView source={{uri: `content`}} style={{flex: 1, height: 200}} />
-      );
+      case ContentType.Text:
+        return <Text style={styles.viewText}>{content.data}</Text>;
+      default:
+        return <Text style={styles.viewText}>Unsupported content type</Text>;
     }
-    return <Text style={styles.viewText}>{content}</Text>;
   };
 
   return (
     <ScrollView style={styles.container}>
-      {renderContent(content)}
+      {renderContent()}
       <View style={styles.contentContainer}>
         <Text style={styles.title}>
           Inscription {inscriptionDetails.number}

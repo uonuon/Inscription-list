@@ -81,6 +81,7 @@ const useInscriptions = (address: string): UseInscriptionsResult => {
 
   useEffect(() => {
     fetchInscriptions();
+    return () => resetInscription();
   }, [fetchInscriptions, address]);
 
   const loadMore = () => {
